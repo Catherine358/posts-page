@@ -6,9 +6,10 @@ interface PostItemProps {
         post: Post;
         user: User | undefined;
     }
+    onFilterByUser: (userId: string) => void;
 }
 
-export default function PostItem({ data }: PostItemProps) {
+export default function PostItem({ data, onFilterByUser }: PostItemProps) {
     const { post, user } = data;
 
   return (
@@ -18,7 +19,8 @@ export default function PostItem({ data }: PostItemProps) {
         <div className="flex justify-between items-center">
             {user && (
                 <button
-                    className="text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
+                    onClick={() => onFilterByUser(user.id)}
+                    className="text-blue-600 bg-white"
                 >
                     {user.name} {user.company ? `(${user.company.name})` : ''}
                 </button>

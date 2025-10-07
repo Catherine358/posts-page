@@ -8,8 +8,11 @@ import PostItem from "../components/PostItem.tsx";
 export default function Dashboard() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [users, setUsers] = useState<User[]>([]);
+    const [selectedUserId, setSelectedUserId] = useState<string>('');
 
     const usersMap = new Map<string, User>(users.map((user) => [user.id, user]));
+
+    const filterdPosts = selectedUserId ? posts.filter((post) => selectedUserId === post.userId) : posts;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -20,15 +23,34 @@ export default function Dashboard() {
         fetchData();
     }, []);
 
+    const addUserIdToFilter = (userId: string) => {
+        if (userId === selectedUserId) return;
+      setSelectedUserId(userId);
+    };
+
+    const resetFilterByUser = () => {
+        setSelectedUserId('');
+    };
+
     return (
       <div>
           <h1 className="mb-4">Posts</h1>
+          <div className="p-4">
+              {selectedUserId && (
+                  <button
+                      onClick={resetFilterByUser}
+                      className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  >
+                      Alle anzeigen
+                  </button>
+              )}
+          </div>
           <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {posts.map((post) => {
+              {filterdPosts.map((post) => {
                   const user = usersMap.get(post.userId);
                   return (
                     <li key={post.id}>
-                        <PostItem data={{ post, user }} />
+                        <PostItem data={{ post, user }} onFilterByUser={addUserIdToFilter} />
                     </li>
                   );
               })}
