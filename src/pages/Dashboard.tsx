@@ -1,4 +1,4 @@
-import {useEffect, useOptimistic, useState, startTransition} from "react";
+import {useEffect, useState} from "react";
 import {fetchPosts} from "../api/posts.ts";
 import {fetchUsers} from "../api/users.ts";
 import type {Post} from "../types/post.ts";
@@ -11,23 +11,14 @@ export default function Dashboard() {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUserId, setSelectedUserId] = useState<string>('');
     const [showOnlyFavPosts, setShowOnlyFavPosts] = useState<boolean>(false);
-    const [showPopup, setShowPopup] = useState<boolean>(false);
-    const [timeoutId, setTimeoutId] = useState<number>(0);
 
-    const { favPosts, clearFavPosts } = useStorePosts();
+    const { favPosts, clearFavPosts, undoClearFavPosts, temporaryFavPosts } = useStorePosts();
 
-    const [optimisticFavPosts, setOptimisticFavPosts] = useOptimistic(
-        favPosts,
-        (currentState, action: { type: 'clear' | 'undo' }) => {
-            if (action.type === 'clear') return [];
-            if (action.type === 'undo') return favPosts;
-            return currentState;
-        }
-        )
+    const showPopup = temporaryFavPosts.length > 0;
 
     const usersMap = new Map<string, User>(users.map((user) => [user.id, user]));
 
-    const favFilteredPosts = showOnlyFavPosts ? posts.filter((post) => optimisticFavPosts.includes(post.id)) : posts;
+    const favFilteredPosts = showOnlyFavPosts ? posts.filter((post) => favPosts.includes(post.id)) : posts;
     const filteredPosts = selectedUserId ? favFilteredPosts.filter((post) => selectedUserId === post.userId) : favFilteredPosts;
 
     useEffect(() => {
@@ -52,28 +43,6 @@ export default function Dashboard() {
       setShowOnlyFavPosts((prevState) => !prevState);
     };
 
-    const removeAllFavPosts = () => {
-        startTransition(() => {
-            setOptimisticFavPosts({ type: 'clear' });
-            setShowPopup(true);
-        });
-
-        const timeout = setTimeout(() => {
-            clearFavPosts();
-            setShowPopup(false);
-        }, 10000);
-
-        setTimeoutId(timeout);
-    };
-
-    const undoRemoveAllFavPosts = () => {
-        clearTimeout(timeoutId);
-        startTransition(() => {
-            setOptimisticFavPosts({ type: 'undo' });
-            setShowPopup(false);
-        });
-    };
-
     return (
       <div className="p-20">
           <h1 className="mb-4">Posts</h1>
@@ -86,7 +55,7 @@ export default function Dashboard() {
                       User Filter entfernen
                   </button>
               )}
-              {optimisticFavPosts.length > 0 && (
+              {(favPosts.length > 0 || showOnlyFavPosts) && (
                   <button
                       onClick={toggleOnlyFavPosts}
                       className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -96,7 +65,7 @@ export default function Dashboard() {
               )}
               {showOnlyFavPosts && filteredPosts.length > 0 && (
                   <button
-                      onClick={removeAllFavPosts}
+                      onClick={clearFavPosts}
                       className="mb-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400"
                   >
                       Alle Favoriten entfernen
@@ -107,7 +76,7 @@ export default function Dashboard() {
                       <span>Alle Favoriten wurden entfernt.</span>
                       <button
                           className="text-black font-semibold px-3 py-1 rounded hover:bg-gray-400"
-                          onClick={undoRemoveAllFavPosts}
+                          onClick={undoClearFavPosts}
                       >
                           Rückgängig machen
                       </button>
