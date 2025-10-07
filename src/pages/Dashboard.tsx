@@ -6,12 +6,13 @@ import type {User} from "../types/user.ts";
 import {useStorePosts} from "../store/useStorePosts.ts";
 import FilterPanel from "../components/FilterPanel.tsx";
 import PostsList from "../components/PostsList.tsx";
+import {useStoreFilters} from "../store/useStoreFilters.ts";
 
 export default function Dashboard() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [users, setUsers] = useState<User[]>([]);
-    const [selectedUserId, setSelectedUserId] = useState<string>('');
-    const [showOnlyFavPosts, setShowOnlyFavPosts] = useState<boolean>(false);
+
+    const { selectedUserId, showOnlyFavPosts } = useStoreFilters();
 
     const { favPosts } = useStorePosts();
 
@@ -27,38 +28,16 @@ export default function Dashboard() {
         fetchData();
     }, []);
 
-    const addUserIdToFilter = (userId: string) => {
-        if (userId === selectedUserId) return;
-      setSelectedUserId(userId);
-    };
-
-    const resetFilterByUser = () => {
-        setSelectedUserId('');
-    };
-
-    const toggleOnlyFavPosts = () => {
-      setShowOnlyFavPosts((prevState) => !prevState);
-    };
-
     return (
       <div className="p-20">
           <h1 className="mb-4">Posts</h1>
           <FilterPanel
           posts={filteredPosts}
-          filters={{
-              selectedUserId,
-              showOnlyFavPosts
-          }}
-          actions={{
-              toggleOnlyFavPosts,
-              resetFilterByUser
-          }}
           />
           <PostsList data={{
               posts: filteredPosts,
               users
           }}
-          onFilterByUser={addUserIdToFilter}
           />
       </div>
     );

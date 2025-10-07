@@ -7,10 +7,9 @@ interface PostsListProps {
         posts: Post[];
         users: User[];
     }
-    onFilterByUser: (userId: string) => void;
 }
 
-export default function PostsList({ data, onFilterByUser }: PostsListProps) {
+export default function PostsList({ data }: PostsListProps) {
     const { posts, users } = data;
 
     if (posts.length === 0) {
@@ -25,7 +24,7 @@ export default function PostsList({ data, onFilterByUser }: PostsListProps) {
                       const user = usersMap.get(post.userId);
                       return (
                           <li key={post.id}>
-                              <PostItem data={{ post, user }} onFilterByUser={onFilterByUser} />
+                              <PostItem data={{ post, user }} />
                           </li>
                       );
                   })}

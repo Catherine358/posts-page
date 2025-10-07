@@ -1,18 +1,19 @@
 import type {Post} from "../types/post.ts";
 import type {User} from "../types/user.ts";
 import {useStorePosts} from "../store/useStorePosts.ts";
+import {useStoreFilters} from "../store/useStoreFilters.ts";
 
 interface PostItemProps {
     data: {
         post: Post;
         user: User | undefined;
     }
-    onFilterByUser: (userId: string) => void;
 }
 
-export default function PostItem({ data, onFilterByUser }: PostItemProps) {
+export default function PostItem({ data }: PostItemProps) {
     const { post, user } = data;
     const { favPosts, toggleFavPosts } = useStorePosts();
+    const { filterByUserId } = useStoreFilters();
 
     const isFavorite = favPosts.includes(post.id);
 
@@ -23,7 +24,7 @@ export default function PostItem({ data, onFilterByUser }: PostItemProps) {
         <div className="flex justify-between items-center">
             {user && (
                 <button
-                    onClick={() => onFilterByUser(user.id)}
+                    onClick={() => filterByUserId(user.id)}
                     className="text-blue-600 bg-white"
                 >
                     {user.name} {user.company ? `(${user.company.name})` : ''}
