@@ -22,8 +22,8 @@ export default function Dashboard() {
 
     return (
       <div>
-          <h1>Posts</h1>
-          <ul>
+          <h1 className="mb-4">Posts</h1>
+          <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {posts.map((post) => {
                   const user = usersMap.get(post.userId);
                   return (
