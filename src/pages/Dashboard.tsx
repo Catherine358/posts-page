@@ -1,5 +1,38 @@
+import {useEffect, useState} from "react";
+import {fetchPosts} from "../api/posts.ts";
+import {fetchUsers} from "../api/users.ts";
+import type {Post} from "../types/post.ts";
+import type {User} from "../types/user.ts";
+import PostItem from "../components/PostItem.tsx";
+
 export default function Dashboard() {
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
+
+    const usersMap = new Map<string, User>(users.map((user) => [user.id, user]));
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const [postsData, usersData] = await Promise.all([fetchPosts(), fetchUsers()]);
+            setPosts(postsData);
+            setUsers(usersData);
+        };
+        fetchData();
+    }, []);
+
     return (
-      <div>Hello</div>
+      <div>
+          <h1>Posts</h1>
+          <ul>
+              {posts.map((post) => {
+                  const user = usersMap.get(post.userId);
+                  return (
+                    <li key={post.id}>
+                        <PostItem data={{ post, user }} />
+                    </li>
+                  );
+              })}
+          </ul>
+      </div>
     );
 };
