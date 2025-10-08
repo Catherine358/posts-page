@@ -1,33 +1,33 @@
-import PostItem from "./PostItem.tsx";
-import type {User} from "../types/user.ts";
-import type {Post} from "../types/post.ts";
+import PostItem from './PostItem.tsx';
+import type { User } from '../types/user.ts';
+import type { Post } from '../types/post.ts';
 
 interface PostsListProps {
-    data: {
-        posts: Post[];
-        users: User[];
-    }
+  data: {
+    posts: Post[];
+    users: User[];
+  };
 }
 
 export default function PostsList({ data }: PostsListProps) {
-    const { posts, users } = data;
+  const { posts, users } = data;
 
-    if (posts.length === 0) {
-        return <p>Liste ist leer.</p>;
-    }
+  if (posts.length === 0) {
+    return <p>Liste ist leer.</p>;
+  }
 
-    const usersMap = new Map<string, User>(users.map((user) => [user.id, user]));
+  const usersMap = new Map<string, User>(users.map((user) => [user.id, user]));
 
-    return (
-              <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                  {posts.map((post) => {
-                      const user = usersMap.get(post.userId);
-                      return (
-                          <li key={post.id}>
-                              <PostItem data={{ post, user }} />
-                          </li>
-                      );
-                  })}
-              </ul>
+  return (
+    <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      {posts.map((post) => {
+        const user = usersMap.get(post.userId);
+        return (
+          <li key={post.id}>
+            <PostItem data={{ post, user }} />
+          </li>
+        );
+      })}
+    </ul>
   );
-};
+}
