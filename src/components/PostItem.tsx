@@ -24,6 +24,7 @@ export default function PostItem({ data }: PostItemProps) {
         <div className="flex justify-between items-center">
             {user && (
                 <button
+                    aria-label={`Posts nach ${user.name} filtern`}
                     onClick={() => filterByUserId(user.id)}
                     className="text-blue-600 bg-white"
                 >
@@ -31,6 +32,7 @@ export default function PostItem({ data }: PostItemProps) {
                 </button>
             )}
             <button
+                aria-label={isFavorite ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'}
                 onClick={() => toggleFavPosts(post.id)}
                 className="text-xl text-gray-400 hover:text-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300 rounded"
             >

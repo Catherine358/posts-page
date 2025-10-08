@@ -1,16 +1,11 @@
-import {useEffect, useState} from "react";
-import {fetchPosts} from "../api/posts.ts";
-import {fetchUsers} from "../api/users.ts";
-import type {Post} from "../types/post.ts";
-import type {User} from "../types/user.ts";
 import {useStorePosts} from "../store/useStorePosts.ts";
 import FilterPanel from "../components/FilterPanel.tsx";
 import PostsList from "../components/PostsList.tsx";
 import {useStoreFilters} from "../store/useStoreFilters.ts";
+import {usePostsData} from "../hooks/usePostsData.ts";
 
 export default function Dashboard() {
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [users, setUsers] = useState<User[]>([]);
+    const { posts, users } = usePostsData();
 
     const { selectedUserId, showOnlyFavPosts } = useStoreFilters();
 
@@ -18,15 +13,6 @@ export default function Dashboard() {
 
     const favFilteredPosts = showOnlyFavPosts ? posts.filter((post) => favPosts.includes(post.id)) : posts;
     const filteredPosts = selectedUserId ? favFilteredPosts.filter((post) => selectedUserId === post.userId) : favFilteredPosts;
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const [postsData, usersData] = await Promise.all([fetchPosts(), fetchUsers()]);
-            setPosts(postsData);
-            setUsers(usersData);
-        };
-        fetchData();
-    }, []);
 
     return (
       <div className="p-20">
