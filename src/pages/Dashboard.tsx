@@ -11,12 +11,13 @@ export default function Dashboard() {
 
   const { favPosts } = useStorePosts();
 
-  const favFilteredPosts = showOnlyFavPosts
-    ? posts.filter((post) => favPosts.includes(post.id))
-    : posts;
-  const filteredPosts = selectedUserId
-    ? favFilteredPosts.filter((post) => selectedUserId === post.userId)
-    : favFilteredPosts;
+  const favPostsSet = new Set(favPosts);
+
+  const filteredPosts = posts.filter((post) => {
+     if (showOnlyFavPosts && !favPostsSet.has(post.id)) return false;
+     if (selectedUserId && post.userId !== selectedUserId) return false;
+     return true;
+  });
 
   return (
     <div className="p-20">
