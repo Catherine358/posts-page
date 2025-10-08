@@ -14,9 +14,9 @@ export default function Dashboard() {
   const favPostsSet = new Set(favPosts);
 
   const filteredPosts = posts.filter((post) => {
-     if (showOnlyFavPosts && !favPostsSet.has(post.id)) return false;
-     if (selectedUserId && post.userId !== selectedUserId) return false;
-     return true;
+    if (showOnlyFavPosts && !favPostsSet.has(post.id)) return false;
+    if (selectedUserId && post.userId !== selectedUserId) return false;
+    return true;
   });
 
   return (
