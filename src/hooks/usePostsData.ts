@@ -1,30 +1,19 @@
-import {useEffect, useState} from "react";
+import {use} from "react";
 import type {Post} from "../types/post.ts";
 import type {User} from "../types/user.ts";
 import {fetchPosts} from "../api/posts.ts";
 import {fetchUsers} from "../api/users.ts";
 
-interface UsePostsDataReturn {
-    posts: Post[];
-    users: User[];
-}
+let dataPromise: Promise<{ posts: Post[]; users: User[] }> | null = null;
 
-export const usePostsData = (): UsePostsDataReturn => {
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [users, setUsers] = useState<User[]>([]);
+const fetchData = () => {
+    if (!dataPromise) {
+        dataPromise = Promise.all([fetchPosts(), fetchUsers()])
+            .then(([postsData, usersData]) => ({ posts: postsData, users: usersData}));
+    }
+    return dataPromise;
+};
 
-    const fetchData = async () => {
-        const [postsData, usersData] = await Promise.all([fetchPosts(), fetchUsers()]);
-        setPosts(postsData);
-        setUsers(usersData);
-    };
-
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    return {
-      posts,
-      users,
-    };
+export const usePostsData = () => {
+    return use(fetchData());
 };
